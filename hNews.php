@@ -67,24 +67,24 @@ class hNews {
       'geo_latitude'         => 0,
       'geo_longitude'        => 0,
       'hnews_principles_url' => get_option('hnews_principles_url'),
-  		'hnews_license_url'    => get_option('hnews_license_url'),
-  		'hnews_license_text'   => get_option('hnews_license_text'),
+      'hnews_license_url'    => get_option('hnews_license_url'),
+      'hnews_license_text'   => get_option('hnews_license_text'),
     );
 
     // parse the args through WordPress parsing function and sanitize
-  	$postarr = wp_parse_args($_POST, $defaults);
-  	$postarr = sanitize_post($postarr, 'db');
-  	// drop fields we don't want
-  	$postarr = array_intersect_key($postarr, $defaults);
+    $postarr = wp_parse_args($_POST, $defaults);
+    $postarr = sanitize_post($postarr, 'db');
+    // drop fields we don't want
+    $postarr = array_intersect_key($postarr, $defaults);
 
-  	// only save the fields which are different. This also catches any instances
-  	// where the hnews fields are not added to a page or custom post type (WP 3)
-  	$diffs = array_diff($postarr, $defaults);
+    // only save the fields which are different. This also catches any instances
+    // where the hnews fields are not added to a page or custom post type (WP 3)
+    $diffs = array_diff($postarr, $defaults);
 
-  	// save to the database, renaming all keys from 'key' to '_key'
-  	foreach ($diffs as $k => $v) {
-  	  add_post_meta($post_ID, "_$k", $v, true) or update_post_meta($post_ID, "_$k", $v);
-  	}
+    // save to the database, renaming all keys from 'key' to '_key'
+    foreach ($diffs as $k => $v) {
+      add_post_meta($post_ID, "_$k", $v, true) or update_post_meta($post_ID, "_$k", $v);
+    }
   }
 
   /**
