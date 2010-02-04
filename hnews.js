@@ -20,7 +20,9 @@ var hnews, hnews_map, hnews_marker;
         return hnews.update(event.latLng);
       });
 
-      hnews.update_marker(loc);
+      if ($('#geo_latitude').val() && $('#geo_longitude').val()) {
+        hnews.update_marker(loc);
+      }
 
       $('input.geo_addr').click(function() {
         hnews.geocode($('#geo_addr').val());
