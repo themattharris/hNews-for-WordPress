@@ -27,6 +27,10 @@
     margin-bottom: 1em;
   }
 
+  #hnews_source_org {
+    clear: both;
+  }
+
   #hnews_org_basic, #hnews_org_address,
   #hnews_principles, #hnews_license {
     width: 50%;

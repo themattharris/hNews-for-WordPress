@@ -1,8 +1,30 @@
-var hnews, hnews_map, hnews_marker;
+var hnews, hnews_map, hnews_marker, hnews_license;
 
 (function($){
+  hnews_license = {
+    init : function(args) {
+      if ( ! $('#hnews_license_url').length) {
+        return;
+      }
+
+      $('#hnews_license_url').blur(function(event){
+        $.get('admin-ajax.php?action=hnews&hnews_url='+escape($(this).val()), function(data) {
+          hnews_license.set_name(data);
+        })
+      });
+    },
+
+    set_name : function(name) {
+      $('#hnews_license_text').val(name);
+    },
+  }
+
   hnews = {
     init : function(args) {
+      if ( ! $('#hnews_geo fieldset').length) {
+        return;
+      }
+
       $('#hnews_geo fieldset').before('<div id="hnews_map"></div>');
 
       lat = $('#geo_latitude').val() || 37.4419;
@@ -72,10 +94,10 @@ var hnews, hnews_map, hnews_marker;
           }
         });
     },
-
   }
 })(jQuery);
 
-jQuery(document).ready(function($){
+jQuery(function($){
   hnews.init();
+  hnews_license.init();
 });

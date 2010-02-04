@@ -40,21 +40,26 @@ class hNews {
     add_action('save_post', array($this, 'save_post'), 10, 2);
 
     // add the custom css to style our boxes
-    add_action('admin_head-post.php', array($this, 'add_css'));
-    add_action('admin_head-post-new.php', array($this, 'add_css'));
+    add_action('admin_print_styles-settings_page_hNews', array($this, 'add_css'));
+    add_action('admin_print_styles-post.php', array($this, 'add_css'));
+    add_action('admin_print_styles-post-new.php', array($this, 'add_css'));
 
     // add the custom js required for our boxes
+    add_action('admin_print_scripts-settings_page_hNews', array($this, 'add_js'));
     add_action('admin_print_scripts-post.php', array($this, 'add_js'));
     add_action('admin_print_scripts-post-new.php', array($this, 'add_js'));
 
     // This filter needs adding to WordPress core. line 395 wp-admin/includes/post.php
     // add_filter('post_to_edit', array($this, 'post_to_edit'));
 
+    // custom ajax handling for looking up the title of a webpage. The hnews is the querystring argument 'action'
+    add_action('wp_ajax_hnews', array($this, 'wp_ajax'));
+
     add_filter('posts_results', array($this, 'posts_results'));
   }
 
   /**
-   * Magic function for handling the renders, Note &$return is missing for 
+   * Magic function for handling the renders, Note &$return is missing for
    * PHP4 as in this class we don't need it
    */
   function __call($method, $arguments) {
@@ -69,7 +74,7 @@ class hNews {
     $var = str_replace('render_', '', $what);
 
     $class = (strstr($var, 'url') || strstr($var, 'email')) ? 'class="code"' : '';
-    echo "<input id='$var' name='hnews_options[$var]' size='70' type='text' value='{$options[$var]}'$class />";
+    echo "<input id='hnews_$var' name='hnews_options[$var]' size='70' type='text' value='{$options[$var]}'$class />";
   }
 
   /**
@@ -86,6 +91,21 @@ class hNews {
     foreach ($this->supported_fields_org as $k => $v) {
       add_settings_field($k, __($v), array($this, "render_$k"), 'hnews_page', 'hnews_settings_org');
     }
+  }
+
+  /**
+   * Ajax handler for the hnews action.
+   * Doing it this way is better as this only runs if the get argument is set - and
+   * allows WordPress to check the user is logged in
+   */
+  function wp_ajax() {
+    if ($response = wp_remote_get(@$_GET['hnews_url'])) {
+      if (preg_match('$<title.*?>(.+?)</title>$is', $response['body'], $matches) == 1) {
+        echo preg_replace('$\s\s+$',' ', strip_tags(trim($matches[1])));
+      }
+    }
+    // stop processing.
+    die();
   }
 
   /**
