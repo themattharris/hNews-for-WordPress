@@ -1,4 +1,4 @@
-<div>
+<div class="wrap">
   <h2><?php _e('hNews Defaults'); ?></h2>
   <form method="post" action="options.php">
 <?php settings_fields('hnews_options');

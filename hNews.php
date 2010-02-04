@@ -10,6 +10,26 @@ Author URI: http://themattharris.com
 */
 
 class hNews {
+  var $supported_fields_main = array(
+    'principles_url' => 'Principles URL',
+    'license_url'    => 'License URL',
+    'license_text'   => 'License Name',
+  );
+
+  var $supported_fields_org = array(
+    'org_name'         => 'Organization Name',
+    'org_unit'         => 'Organization Unit',
+    'email'            => 'Email',
+    'url'              => 'URL',
+    'tel'              => 'Phone',
+    'post_office_box'  => 'PO Box',
+    'extended_address' => 'Apartment/Suite Number',
+    'street_address'   => 'Street Address',
+    'locality'         => 'City/Town',
+    'region'           => 'State/County',
+    'postal_code'      => 'Zip/Postal Code',
+    'country_name'     => 'Country',
+  );
 
   /**
    * Register our actions with the WordPress hooks
@@ -34,27 +54,38 @@ class hNews {
   }
 
   /**
+   * Magic function for handling the renders, Note &$return is missing for 
+   * PHP4 as in this class we don't need it
+   */
+  function __call($method, $arguments) {
+    if (strstr($method, 'render_'))
+      $this->render($method);
+    else
+      trigger_error('Call to undefined method ' . __CLASS__ . '::' . $method . '()', E_USER_ERROR);
+  }
+
+  function render($what) {
+    $options = get_option('hnews_options');
+    $var = str_replace('render_', '', $what);
+
+    $class = (strstr($var, 'url') || strstr($var, 'email')) ? 'class="code"' : '';
+    echo "<input id='$var' name='hnews_options[$var]' size='70' type='text' value='{$options[$var]}'$class />";
+  }
+
+  /**
    * Register the hNews Settings
    */
   function admin_init() {
     register_setting('hnews_options', 'hnews_options', array($this, 'options_validate'));
     add_settings_section('hnews_settings_main', __('Main Settings'), array($this, 'render_main_section_text'), 'hnews_page');
-    add_settings_field('principles_url', __('Principles URL'), array($this, 'render_principles_url'), 'hnews_page', 'hnews_settings_main');
-    add_settings_field('license_url', __('License URL'), array($this, 'render_license_url'), 'hnews_page', 'hnews_settings_main');
-    add_settings_field('license_text', __('License Label'), array($this, 'render_license_text'), 'hnews_page', 'hnews_settings_main');
+    foreach ($this->supported_fields_main as $k => $v) {
+      add_settings_field($k, __($v), array($this, "render_$k"), 'hnews_page', 'hnews_settings_main');
+    }
 
     add_settings_section('hnews_settings_org', __('Source Organisation'), array($this, 'render_org_section_text'), 'hnews_page');
-    add_settings_field('org_name', __('Organization Name:'), array($this, 'render_org_name'), 'hnews_page', 'hnews_settings_org');
-    add_settings_field('org_unit', __('Organization Unit:'), array($this, 'render_org_unit'), 'hnews_page', 'hnews_settings_org');
-    add_settings_field('email', __('Email:'), array($this, 'render_email'), 'hnews_page', 'hnews_settings_org');
-    add_settings_field('url', __('URL:'), array($this, 'render_url'), 'hnews_page', 'hnews_settings_org');
-    add_settings_field('post_office_box', __('PO Box:'), array($this, 'render_post_office_box'), 'hnews_page', 'hnews_settings_org');
-    add_settings_field('extended_address', __('Apartment/Suite Number:'), array($this, 'render_extended_address'), 'hnews_page', 'hnews_settings_org');
-    add_settings_field('street_address', __('Street Address:'), array($this, 'render_street_address'), 'hnews_page', 'hnews_settings_org');
-    add_settings_field('locality', __('Locality/Town:'), array($this, 'render_locality'), 'hnews_page', 'hnews_settings_org');
-    add_settings_field('region', __('Region/County:'), array($this, 'render_region'), 'hnews_page', 'hnews_settings_org');
-    add_settings_field('postal_code', __('Postal/Zip Code:'), array($this, 'render_postal_code'), 'hnews_page', 'hnews_settings_org');
-    add_settings_field('country_name', __('Country:'), array($this, 'render_country_name'), 'hnews_page', 'hnews_settings_org');
+    foreach ($this->supported_fields_org as $k => $v) {
+      add_settings_field($k, __($v), array($this, "render_$k"), 'hnews_page', 'hnews_settings_org');
+    }
   }
 
   /**
@@ -73,67 +104,8 @@ class hNews {
   function render_main_section_text() {
     echo '<p>'.__('The URLs and labels you enter here will be used as the default value when adding a new post.').'</p>';
   }
-  // Option fields rendering code
-  function render_principles_url() {
-    $options = get_option('hnews_options');
-    echo "<input id='hnews_principles_url' name='hnews_options[principles_url]' size='70' type='text' value='{$options['principles_url']}' class='code' />";
-  }
-  function render_license_url() {
-    $options = get_option('hnews_options');
-    echo "<input id='hnews_license_url' name='hnews_options[license_url]' size='70' type='text' value='{$options['license_url']}' class='code' />";
-  }
-  function render_license_text() {
-    $options = get_option('hnews_options');
-    echo "<input id='hnews_license_text' name='hnews_options[license_text]' size='40' type='text' value='{$options['license_text']}' />";
-  }
-
   function render_org_section_text() {
     echo '<p>'.__('The source organisation you enter here will be used as the default organisation when adding a new post.').'</p>';
-  }
-  // Option fields rendering code
-  function render_org_name() {
-    $options = get_option('hnews_options');
-    echo "<input id='hnews_org_name' name='hnews_options[org_name]' size='40' type='text' value='{$options['org_name']}' />";
-  }
-  function render_org_unit() {
-    $options = get_option('hnews_options');
-    echo "<input id='hnews_org_unit' name='hnews_options[org_unit]' size='40' type='text' value='{$options['org_unit']}' />";
-  }
-  function render_email() {
-    $options = get_option('hnews_options');
-    echo "<input id='hnews_email' name='hnews_options[email]' size='70' type='text' value='{$options['email']}' class='code' />";
-  }
-  function render_url() {
-    $options = get_option('hnews_options');
-    echo "<input id='hnews_url' name='hnews_options[url]' size='70' type='text' value='{$options['url']}' class='code' />";
-  }
-  function render_post_office_box() {
-    $options = get_option('hnews_options');
-    echo "<input id='hnews_post_office_box' name='hnews_options[post_office_box]' size='40' type='text' value='{$options['post_office_box']}' />";
-  }
-  function render_extended_address() {
-    $options = get_option('hnews_options');
-    echo "<input id='hnews_extended_address' name='hnews_options[extended_address]' size='40' type='text' value='{$options['extended_address']}' />";
-  }
-  function render_street_address() {
-    $options = get_option('hnews_options');
-    echo "<input id='hnews_street_address' name='hnews_options[street_address]' size='40' type='text' value='{$options['street_address']}' />";
-  }
-  function render_locality() {
-    $options = get_option('hnews_options');
-    echo "<input id='hnews_locality' name='hnews_options[locality]' size='40' type='text' value='{$options['locality']}' />";
-  }
-  function render_region() {
-    $options = get_option('hnews_options');
-    echo "<input id='hnews_region' name='hnews_options[region]' size='40' type='text' value='{$options['region']}' />";
-  }
-  function render_postal_code() {
-    $options = get_option('hnews_options');
-    echo "<input id='hnews_postal_code' name='hnews_options[postal_code]' size='40' type='text' value='{$options['postal_code']}' />";
-  }
-  function render_country_name() {
-    $options = get_option('hnews_options');
-    echo "<input id='hnews_country_name' name='hnews_options[country_name]' size='40' type='text' value='{$options['country_name']}' />";
   }
 
   /**
@@ -157,10 +129,11 @@ class hNews {
     $defaults = array(
       'geo_latitude'         => 0,
       'geo_longitude'        => 0,
-      'hnews_principles_url' => '',
-      'hnews_license_url'    => '',
-      'hnews_license_text'   => '',
     );
+
+    foreach ($this->supported_fields_main + $this->supported_fields_org as $k => $v) {
+      $defaults["hnews_$k"] = '';
+    }
 
     // parse the args through WordPress parsing function and sanitize
     $postarr = wp_parse_args($_POST, $defaults);
@@ -202,11 +175,14 @@ class hNews {
     if ( ! isset($post->hnews_principles_url)) {
       $this->post_to_edit($post);
     }
-
     $options = get_option('hnews_options');
-    $principles_url = empty($post->hnews_principles_url) ? $options['principles_url'] : $post->hnews_principles_url;
-    $license_url = empty($post->hnews_license_url) ? $options['license_url'] : $post->hnews_license_url;
-    $license_text = empty($post->hnews_license_text) ? $options['license_text'] : $post->hnews_license_text;
+    foreach ($this->supported_fields_main + $this->supported_fields_org as $k => $v) {
+      if (empty($post->{"hnews_$k"}) && empty($post->ID))
+        $$k = $options[$k];
+      elseif ( ! empty($post->{"hnews_$k"})) {
+        $$k = $post->{"hnews_$k"};
+      }
+    }
     require 'box_main.php';
   }
 
@@ -226,11 +202,11 @@ class hNews {
    */
   function post_to_edit($post) {
     $id = $post->ID;
-    $post->geo_latitude = get_post_meta( $id, '_geo_latitude', true );
-    $post->geo_longitude = get_post_meta( $id, '_geo_longitude', true );
-    $post->hnews_principles_url = get_post_meta( $id, '_hnews_principles_url', true );
-    $post->hnews_license_url = get_post_meta( $id, '_hnews_license_url', true );
-    $post->hnews_license_text = get_post_meta( $id, '_hnews_license_text', true );
+    $post->geo_latitude         = get_post_meta($id, '_geo_latitude', true );
+    $post->geo_longitude        = get_post_meta($id, '_geo_longitude', true );
+    foreach ($this->supported_fields_main + $this->supported_fields_org as $k => $v) {
+      $post->{"hnews_$k"} = get_post_meta($id, "_hnews_$k", true );
+    }
     return $post;
   }
 
