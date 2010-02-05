@@ -9,7 +9,7 @@
   </div>
   <div id="geo_addr_wrap" class="hide-if-no-js">
     <label class="screen-reader-text" for="geo_addr"><?php _e('Address:') ?></label>
-    <div class="geo_addrhint"><?php _e('Address to lookup:') ?></div>
+    <div id="geo_addrhint"><?php _e('Address to lookup') ?></div>
     <input type="text" id="geo_addr" name="geo_addr" class="form-input-tip" size="16" autocomplete="off" value="">
     <input type="button" class="button geo_addr" value="Find" tabindex="3">
   </div>

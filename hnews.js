@@ -47,14 +47,39 @@ var hnews, hnews_map, hnews_marker, hnews_license;
       }
 
       $('input.geo_addr').click(function() {
-        hnews.geocode($('#geo_addr').val());
+        hnews.geocode();
       });
+
+      $('#geo_addr').focus(function() {
+        hnews.hide_hint();
+      }).blur(function() {
+        hnews.show_hint();
+      }).keydown(function(event) {
+        if (event.which == 13) { // enter
+          hnews.geocode();
+          return false;
+        }
+      });
+      hnews.show_hint();
     },
 
     update : function(loc) {
       hnews.move_to(loc);
       hnews.update_marker(loc);
       hnews.update_textboxes(loc);
+    },
+
+    show_hint : function() {
+      $('#geo_addrhint').hide();
+      if ($('#geo_addr').val() == '') {
+        $('#geo_addr').val($('#geo_addrhint').text());
+      }
+    },
+
+    hide_hint : function() {
+      if ($('#geo_addr').val() == $('#geo_addrhint').text()) {
+        $('#geo_addr').val('');
+      }
     },
 
     update_marker : function(loc) {
@@ -81,6 +106,7 @@ var hnews, hnews_map, hnews_marker, hnews_license;
     },
 
     geocode : function(address) {
+      address = ( ! address) ? $('#geo_addr').val() : address;
       geocoder = new google.maps.Geocoder();
       geocoder.geocode({
           'address': address

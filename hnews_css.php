@@ -37,9 +37,27 @@
     float: left;
   }
 
+  #hnews_org_basic div, #hnews_org_address div,
+  #hnews_principles div, #hnews_license div,
+  #hnews_geo fieldset div {
+    margin-bottom: 1em;
+  }
+  #hnews_geo #geo_addrhint {
+    margin-bottom: 0;
+  }
+
   #hnews_org_basic label, #hnews_org_address label,
   #hnews_principles label, #hnews_license label {
     display: block;
+  }
+
+  #hnews_geo fieldset div#geo_addrhint {
+    float: none;
+    width: auto;
+  }
+
+  #geo_addr {
+    width: 180px;
   }
 
   #hnews_org_basic input, #hnews_org_address input,
