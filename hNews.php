@@ -10,6 +10,11 @@ Author URI: http://themattharris.com
 */
 
 class hNews {
+  var $supported_fields_geo = array(
+    'geo_latitude'  => 'Latitude',
+    'geo_longitude' => 'Longitude',
+  );
+
   var $supported_fields_main = array(
     'principles_url' => 'Principles URL',
     'license_url'    => 'License URL',
@@ -91,6 +96,11 @@ class hNews {
     foreach ($this->supported_fields_org as $k => $v) {
       add_settings_field($k, __($v), array($this, "render_$k"), 'hnews_page', 'hnews_settings_org');
     }
+
+    add_settings_section('hnews_settings_geo', __('Geolocation'), array($this, 'render_geo_section_text'), 'hnews_page');
+    foreach ($this->supported_fields_geo as $k => $v) {
+      add_settings_field($k, __($v), array($this, "render_$k"), 'hnews_page', 'hnews_settings_geo');
+    }
   }
 
   /**
@@ -127,6 +137,9 @@ class hNews {
   function render_org_section_text() {
     echo '<p>'.__('The source organisation you enter here will be used as the default organisation when adding a new post.').'</p>';
   }
+  function render_geo_section_text() {
+    echo '<p>'.__('The location you enter here will be used as the default location when adding a new post.').'</p>';
+  }
 
   /**
    * Register the meta boxes and admin options
@@ -146,11 +159,10 @@ class hNews {
    */
   function save_post($post_ID, $post) {
     // url defaults are read from wp_options
-    $defaults = array(
-      'geo_latitude'         => 0,
-      'geo_longitude'        => 0,
-    );
-
+    $defaults = array();
+    foreach ($this->supported_fields_geo as $k => $v) {
+      $defaults["hnews_$k"] = 0;
+    }
     foreach ($this->supported_fields_main + $this->supported_fields_org as $k => $v) {
       $defaults["hnews_$k"] = '';
     }
@@ -211,7 +223,7 @@ class hNews {
    */
   function meta_box_geo($post) {
     // fallback for when the filter for post_to_edit isn't present
-    if ( ! isset($post->geo_latitude)) {
+    if ( ! isset($post->hnews_geo_latitude)) {
       $this->post_to_edit($post);
     }
     require 'box_geo.php';
@@ -222,9 +234,7 @@ class hNews {
    */
   function post_to_edit($post) {
     $id = $post->ID;
-    $post->geo_latitude         = get_post_meta($id, '_geo_latitude', true );
-    $post->geo_longitude        = get_post_meta($id, '_geo_longitude', true );
-    foreach ($this->supported_fields_main + $this->supported_fields_org as $k => $v) {
+    foreach ($this->supported_fields_geo + $this->supported_fields_main + $this->supported_fields_org as $k => $v) {
       $post->{"hnews_$k"} = get_post_meta($id, "_hnews_$k", true );
     }
     return $post;

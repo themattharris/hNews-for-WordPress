@@ -21,14 +21,16 @@ var hnews, hnews_map, hnews_marker, hnews_license;
 
   hnews = {
     init : function(args) {
-      if ( ! $('#hnews_geo fieldset').length) {
+      if ($('#hnews_geo fieldset').length) {
+        $('#hnews_geo fieldset').before('<div id="hnews_map"></div>');
+      } else if ($('tr #hnews_geo_latitude').length) {
+        $('tr #hnews_geo_latitude').closest('table').before('<div id="hnews_map"></div>');
+      } else {
         return;
       }
 
-      $('#hnews_geo fieldset').before('<div id="hnews_map"></div>');
-
-      lat = $('#geo_latitude').val() || 37.4419;
-      lng = $('#geo_longitude').val() || -122.1419;
+      lat = $('#hnews_geo_latitude').val() || 37.4419;
+      lng = $('#hnews_geo_longitude').val() || -122.1419;
       loc = new google.maps.LatLng(lat, lng);
 
       hnews_map = new google.maps.Map(
@@ -42,7 +44,7 @@ var hnews, hnews_map, hnews_marker, hnews_license;
         return hnews.update(event.latLng);
       });
 
-      if ($('#geo_latitude').val() && $('#geo_longitude').val()) {
+      if ($('#hnews_geo_latitude').val() && $('#hnews_geo_longitude').val()) {
         hnews.update_marker(loc);
       }
 
@@ -101,8 +103,8 @@ var hnews, hnews_map, hnews_marker, hnews_license;
       lat = loc.lat().toFixed(4);
       lng = loc.lng().toFixed(4);
 
-      $('#geo_latitude').val(lat);
-      $('#geo_longitude').val(lng);
+      $('#hnews_geo_latitude').val(lat);
+      $('#hnews_geo_longitude').val(lng);
     },
 
     geocode : function(address) {

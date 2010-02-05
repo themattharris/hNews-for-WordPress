@@ -61,8 +61,17 @@
   }
 
   #hnews_org_basic input, #hnews_org_address input,
-  #hnews_principles input, #hnews_license input {
+  #hnews_principles input, #hnews_license input,
+  body.settings_page_hNews tr input {
     width: 90%;
+    max-width: 400px;
   }
+
+  body.settings_page_hNews #hnews_map {
+    width: 90%;
+    max-width: 650px;
+  }
+
+
 
 </style>
