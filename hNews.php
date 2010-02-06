@@ -35,6 +35,13 @@ class hNews {
     'postal_code'      => 'Zip/Postal Code',
     'country_name'     => 'Country',
   );
+  
+  /**
+   * PHP4 constructor; Calls PHP 5 style constructor
+   */
+  function hNews() {
+    $this->__construct();
+  }
 
   /**
    * Register our actions with the WordPress hooks
@@ -63,23 +70,11 @@ class hNews {
     add_filter('posts_results', array($this, 'posts_results'));
   }
 
-  /**
-   * Magic function for handling the renders, Note &$return is missing for
-   * PHP4 as in this class we don't need it
-   */
-  function __call($method, $arguments) {
-    if (strstr($method, 'render_'))
-      $this->render($method);
-    else
-      trigger_error('Call to undefined method ' . __CLASS__ . '::' . $method . '()', E_USER_ERROR);
-  }
-
   function render($what) {
     $options = get_option('hnews_options');
-    $var = str_replace('render_', '', $what);
 
-    $class = (strstr($var, 'url') || strstr($var, 'email')) ? 'class="code"' : '';
-    echo "<input id='hnews_$var' name='hnews_options[$var]' size='70' type='text' value='{$options[$var]}'$class />";
+    $class = (strstr($what, 'url') || strstr($what, 'email')) ? 'class="code"' : '';
+    echo "<input id='hnews_$what' name='hnews_options[$what]' size='70' type='text' value='{$options[$what]}'$class />";
   }
 
   /**
@@ -89,17 +84,17 @@ class hNews {
     register_setting('hnews_options', 'hnews_options', array($this, 'options_validate'));
     add_settings_section('hnews_settings_main', __('Main Settings'), array($this, 'render_main_section_text'), 'hnews_page');
     foreach ($this->supported_fields_main as $k => $v) {
-      add_settings_field($k, __($v), array($this, "render_$k"), 'hnews_page', 'hnews_settings_main');
+      add_settings_field($k, __($v), array($this, 'render'), 'hnews_page', 'hnews_settings_main', $k);
     }
 
     add_settings_section('hnews_settings_org', __('Source Organisation'), array($this, 'render_org_section_text'), 'hnews_page');
     foreach ($this->supported_fields_org as $k => $v) {
-      add_settings_field($k, __($v), array($this, "render_$k"), 'hnews_page', 'hnews_settings_org');
+      add_settings_field($k, __($v), array($this, 'render'), 'hnews_page', 'hnews_settings_org', $k);
     }
 
     add_settings_section('hnews_settings_geo', __('Geolocation'), array($this, 'render_geo_section_text'), 'hnews_page');
     foreach ($this->supported_fields_geo as $k => $v) {
-      add_settings_field($k, __($v), array($this, "render_$k"), 'hnews_page', 'hnews_settings_geo');
+      add_settings_field($k, __($v), array($this, 'render'), 'hnews_page', 'hnews_settings_geo', $k);
     }
   }
 
@@ -119,11 +114,11 @@ class hNews {
   }
 
   /**
-   * Validation and sanitisation for the hNews options
+   * Validation and sanitisation for the hNews options. PHP 4 compatible
    */
   function options_validate($fields) {
-    foreach ($fields as $k => &$v) {
-      $v = stripslashes(wp_filter_post_kses(addslashes(trim($v)))); // wp_filter_post_kses() expects slashed
+    foreach ($fields as $k => $v) {
+      $fields[$k] = stripslashes(wp_filter_post_kses(addslashes(trim($v)))); // wp_filter_post_kses() expects slashed
     }
     return $fields;
   }
@@ -244,8 +239,8 @@ class hNews {
    * Process all post results and add the custom fields
    */
   function posts_results($posts) {
-    foreach ($posts as &$post) {
-      $post = $this->post_to_edit($post);
+    foreach ($posts as $k => $post) {
+      $posts[$k] = $this->post_to_edit($post);
     }
     return $posts;
   }
@@ -259,7 +254,5 @@ class hNews {
 }
 
 include 'template_functions.php';
-
 new hNews();
-
 ?>
