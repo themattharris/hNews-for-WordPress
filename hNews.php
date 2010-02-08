@@ -130,7 +130,7 @@ class hNews {
     echo '<p>'.__('The URLs and labels you enter here will be used as the default value when adding a new post.').'</p>';
   }
   function render_org_section_text() {
-    echo '<p>'.__('The source organisation you enter here will be used as the default organisation when adding a new post.').'</p>';
+    echo '<p>'.__('The source organisation you enter here will be used as the default organisation when adding a new post. All fields are optional. ').'</p>';
   }
   function render_geo_section_text() {
     echo '<p>'.__('The location you enter here will be used as the default location when adding a new post.').'</p>';
