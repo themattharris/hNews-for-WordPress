@@ -221,6 +221,14 @@ class hNews {
     if ( ! isset($post->hnews_geo_latitude)) {
       $this->post_to_edit($post);
     }
+    $options = get_option('hnews_options');
+    foreach ($this->supported_fields_geo as $k => $v) {
+      if (empty($post->{"hnews_$k"}) && empty($post->ID))
+        $$k = $options[$k];
+      elseif ( ! empty($post->{"hnews_$k"})) {
+        $$k = $post->{"hnews_$k"};
+      }
+    }
     require 'box_geo.php';
   }
 
