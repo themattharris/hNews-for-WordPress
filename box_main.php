@@ -5,6 +5,11 @@
     <input name="hnews_principles_url" type="text" class="code" id="hnews_principles_url" value="<?php echo esc_attr($principles_url); ?>" /><br />
     <p class="howto"><?php _e('This is the URL where your statement of principles can be found.'); ?></p>
   </div>
+
+  <div>
+    <label for="hnews_principles_text"><?php _e('Principles label:') ?></label>
+    <input name="hnews_principles_text" type="text" id="hnews_principles_text" value="<?php echo esc_attr($principles_text); ?>" />
+  </div>
 </fieldset>
 
 <fieldset id="hnews_license">
@@ -22,6 +27,7 @@
 
 <fieldset id="hnews_source_org">
   <legend><?php _e('Source Organisation') ?></legend>
+  <p><?php __('All fields are optional.') ?></p>
 
   <div id="hnews_org_basic">
     <div>

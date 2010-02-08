@@ -2,20 +2,21 @@ var hnews, hnews_map, hnews_marker, hnews_license;
 
 (function($){
   hnews_license = {
-    init : function(args) {
-      if ( ! $('#hnews_license_url').length) {
+    init : function(selector) {
+      if ( ! $(selector).length) {
         return;
       }
 
-      $('#hnews_license_url').blur(function(event){
+      $(selector).blur(function(event){
         $.get('admin-ajax.php?action=hnews&hnews_url='+escape($(this).val()), function(data) {
-          hnews_license.set_name(data);
+          selector = selector.replace('url', 'text');
+          hnews_license.set_name(selector, data);
         })
       });
     },
 
-    set_name : function(name) {
-      $('#hnews_license_text').val(name);
+    set_name : function(selector, name) {
+      $(selector).val(name);
     },
   }
 
@@ -127,5 +128,6 @@ var hnews, hnews_map, hnews_marker, hnews_license;
 
 jQuery(function($){
   hnews.init();
-  hnews_license.init();
+  hnews_license.init('#hnews_license_url');
+  hnews_license.init('#hnews_principles_url');
 });

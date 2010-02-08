@@ -16,9 +16,10 @@ class hNews {
   );
 
   var $supported_fields_main = array(
-    'principles_url' => 'Principles URL',
-    'license_url'    => 'License URL',
-    'license_text'   => 'License Name',
+    'principles_url'  => 'Principles URL',
+    'principles_text' => 'Principles Label',
+    'license_url'     => 'License URL',
+    'license_text'    => 'License Name',
   );
 
   var $supported_fields_org = array(
