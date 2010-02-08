@@ -66,6 +66,10 @@
     width: 90%;
     max-width: 400px;
   }
+  body.settings_page_hNews tr input.button {
+    width: auto;
+    margin: 0 2em;
+  }
 
   body.settings_page_hNews #hnews_map {
     width: 90%;
