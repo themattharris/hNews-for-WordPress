@@ -36,7 +36,7 @@ class hNews {
     'postal_code'      => 'Zip/Postal Code',
     'country_name'     => 'Country',
   );
-  
+
   /**
    * PHP4 constructor; Calls PHP 5 style constructor
    */
@@ -182,8 +182,86 @@ class hNews {
   /**
    * Add the custom CSS we need to render our meta boxes
    */
-  function add_css() {
-    require 'hnews_css.php';
+  function add_css() { ?>
+    <style type="text/css" media="screen">
+      #hnews_geo fieldset div {
+        width: 50%;
+        float: left;
+      }
+
+      #hnews_geo #geo_addr_wrap {
+        clear: both;
+        width: auto;
+        float: none;
+      }
+
+      #hnews_main fieldset {
+        margin-bottom: 2em;
+      }
+
+      #hnews_main legend {
+        font-weight: bold;
+        padding-bottom: 0.5em;
+      }
+
+      #hnews_map {
+        display: block;
+        height: 200px;
+        width: 100%;
+        border: 1px solid rgb(128,128,128);
+        margin-bottom: 1em;
+      }
+
+      #hnews_source_org {
+        clear: both;
+      }
+
+      #hnews_org_basic, #hnews_org_address,
+      #hnews_principles, #hnews_license {
+        width: 50%;
+        float: left;
+      }
+
+      #hnews_org_basic div, #hnews_org_address div,
+      #hnews_principles div, #hnews_license div,
+      #hnews_geo fieldset div {
+        margin-bottom: 1em;
+      }
+      #hnews_geo #geo_addrhint {
+        margin-bottom: 0;
+      }
+
+      #hnews_org_basic label, #hnews_org_address label,
+      #hnews_principles label, #hnews_license label {
+        display: block;
+      }
+
+      #hnews_geo fieldset div#geo_addrhint {
+        float: none;
+        width: auto;
+      }
+
+      #geo_addr {
+        width: 180px;
+      }
+
+      #hnews_org_basic input, #hnews_org_address input,
+      #hnews_principles input, #hnews_license input,
+      body.settings_page_hNews tr input {
+        width: 90%;
+        max-width: 400px;
+      }
+      body.settings_page_hNews tr input.button {
+        width: auto;
+        margin: 0 2em;
+      }
+
+      body.settings_page_hNews #hnews_map {
+        width: 90%;
+        max-width: 650px;
+      }
+    </style>    
+<?php
   }
 
   /**
@@ -191,7 +269,7 @@ class hNews {
    * our hNews javascript file.
    */
   function add_js() {
-    require 'hnews_js.php';
+    echo '<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>';
     wp_enqueue_script('hNews', '/'.PLUGINDIR.'/hNews/hnews.js');
   }
 
@@ -210,8 +288,103 @@ class hNews {
       elseif ( ! empty($post->{"hnews_$k"})) {
         $$k = $post->{"hnews_$k"};
       }
-    }
-    require 'box_main.php';
+    } ?>
+    <fieldset id="hnews_principles">
+      <legend><?php _e('Principles') ?></legend>
+      <div>
+        <label for="hnews_principles_url"><?php _e('Principles URL:') ?></label>
+        <input name="hnews_principles_url" type="text" class="code" id="hnews_principles_url" value="<?php echo esc_attr($principles_url); ?>" /><br />
+        <p class="howto"><?php _e('This is the URL where your statement of principles can be found.'); ?></p>
+      </div>
+
+      <div>
+        <label for="hnews_principles_text"><?php _e('Principles label:') ?></label>
+        <input name="hnews_principles_text" type="text" id="hnews_principles_text" value="<?php echo esc_attr($principles_text); ?>" />
+      </div>
+    </fieldset>
+
+    <fieldset id="hnews_license">
+      <legend><?php _e('License') ?></legend>
+      <div>
+        <label for="hnews_license_url"><?php _e('License URL:') ?></label>
+        <input name="hnews_license_url" type="text" class="code" id="hnews_license_url" value="<?php echo esc_attr($license_url); ?>" />
+      </div>
+
+      <div>
+        <label for="hnews_license_text"><?php _e('License name:') ?></label>
+        <input name="hnews_license_text" type="text" id="hnews_license_text" value="<?php echo esc_attr($license_text); ?>" />
+      </div>
+    </fieldset>
+
+    <fieldset id="hnews_source_org">
+      <legend><?php _e('Source Organisation') ?></legend>
+      <p><?php __('All fields are optional.') ?></p>
+
+      <div id="hnews_org_basic">
+        <div>
+          <label for="hnews_org_name"><?php _e('Organization Name:') ?></label>
+          <input name="hnews_org_name" type="text" id="hnews_org_name" value="<?php echo esc_attr($org_name); ?>" />
+        </div>
+
+        <div>
+          <label for="hnews_org_unit"><?php _e('Organization Unit:') ?></label>
+          <input name="hnews_org_unit" type="text" id="hnews_org_unit" value="<?php echo esc_attr($org_unit); ?>" />
+        </div>
+
+        <div>
+          <label for="hnews_email"><?php _e('Email:') ?></label>
+          <input name="hnews_email" type="text" class="code" id="hnews_email" value="<?php echo esc_attr($email); ?>" />
+        </div>
+
+        <div>
+          <label for="hnews_url"><?php _e('URL:') ?></label>
+          <input name="hnews_url" type="text" class="code" id="hnews_url" value="<?php echo esc_attr($url); ?>" />
+        </div>
+
+        <div>
+          <label for="hnews_tel"><?php _e('Phone:') ?></label>
+          <input name="hnews_tel" type="text" id="hnews_tel" value="<?php echo esc_attr($tel); ?>" />
+        </div>
+      </div>
+
+      <div id="hnews_org_address">
+        <div>
+          <label for="hnews_post_office_box"><?php _e('PO Box:') ?></label>
+          <input name="hnews_post_office_box" type="text" id="hnews_post_office_box" value="<?php echo esc_attr($post_office_box); ?>" />
+        </div>
+
+        <div>
+          <label for="hnews_extended_address"><?php _e('Apartment/Suite Number:') ?></label>
+          <input name="hnews_extended_address" type="text" id="hnews_extended_address" value="<?php echo esc_attr($extended_address); ?>" />
+        </div>
+
+        <div>
+          <label for="hnews_street_address"><?php _e('Street Address:') ?></label>
+          <input name="hnews_street_address" type="text" id="hnews_street_address" value="<?php echo esc_attr($street_address); ?>" />
+        </div>
+
+        <div>
+          <label for="hnews_locality"><?php _e('City/Town:') ?></label>
+          <input name="hnews_locality" type="text" id="hnews_locality" value="<?php echo esc_attr($locality); ?>" />
+        </div>
+
+        <div>
+          <label for="hnews_region"><?php _e('State/County:') ?></label>
+          <input name="hnews_region" type="text" id="hnews_region" value="<?php echo esc_attr($region); ?>" />
+        </div>
+
+        <div>
+          <label for="hnews_postal_code"><?php _e('Zip/Postal Code:') ?></label>
+          <input name="hnews_postal_code" type="text" id="hnews_postal_code" value="<?php echo esc_attr($postal_code); ?>" />
+        </div>
+
+        <div>
+          <label for="hnews_country_name"><?php _e('Country:') ?></label>
+          <input name="hnews_country_name" type="text" id="hnews_country_name" value="<?php echo esc_attr($country_name); ?>" />
+        </div>
+      </div>
+    </fieldset>    
+<?php
   }
 
   /**
@@ -229,8 +402,24 @@ class hNews {
       elseif ( ! empty($post->{"hnews_$k"})) {
         $$k = $post->{"hnews_$k"};
       }
-    }
-    require 'box_geo.php';
+    } ?>
+    <fieldset>
+      <div>
+        <label for="hnews_geo_latitude"><?php _e('Latitude:') ?></label>
+        <input name="hnews_geo_latitude" type="text" size="13" id="hnews_geo_latitude" value="<?php echo esc_attr($geo_latitude); ?>" />
+      </div>
+      <div>
+        <label for="hnews_geo_longitude"><?php _e('Longitude:') ?></label>
+        <input name="hnews_geo_longitude" type="text" size="13" id="hnews_geo_longitude" value="<?php echo esc_attr($geo_longitude); ?>" />
+      </div>
+      <div id="geo_addr_wrap" class="hide-if-no-js">
+        <label class="screen-reader-text" for="geo_addr"><?php _e('Address:') ?></label>
+        <div id="geo_addrhint"><?php _e('Address to lookup') ?></div>
+        <input type="text" id="geo_addr" name="geo_addr" class="form-input-tip" size="16" autocomplete="off" value="">
+        <input type="button" class="button geo_addr" value="Find" tabindex="3">
+      </div>
+    </fieldset>    
+<?php
   }
 
   /**
@@ -257,8 +446,33 @@ class hNews {
   /**
    * The hNews admin options rendering function
    */
-  function hnews_options_page() {
-    require 'admin_options.php';
+  function hnews_options_page() { ?>
+    <div class="wrap">
+      <h2><?php _e('hNews Defaults'); ?></h2>
+      <form method="post" action="options.php">
+<?php settings_fields('hnews_options');
+      do_settings_sections('hnews_page');
+?>
+        <table class="form-table" class="hide-if-no-js">
+          <tbody>
+            <tr valign="top">
+              <th scope="row">
+                <label for="geo_addr"><?php _e('Address to lookup') ?></label>
+              </th>
+              <td>
+                <input type="text" id="geo_addr" name="geo_addr" size="16" autocomplete="off" value="">
+                <input type="button" class="button geo_addr" value="Find">
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p class="submit">
+          <input type="submit" name="Submit" class="button-primary" value="Save Changes">
+        </p>
+      </form>
+    </div>
+<?php
   }
 }
 
