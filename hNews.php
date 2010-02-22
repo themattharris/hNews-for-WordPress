@@ -160,7 +160,7 @@ class hNews {
       $defaults["hnews_$k"] = 0;
     }
     foreach ($this->supported_fields_main + $this->supported_fields_org as $k => $v) {
-      $defaults["hnews_$k"] = '';
+      $defaults["hnews_$k"] = strstr($k, 'url') ? 'http://' : "\n";
     }
 
     // parse the args through WordPress parsing function and sanitize
@@ -175,7 +175,11 @@ class hNews {
 
     // save to the database, renaming all keys from 'key' to '_key'
     foreach ($diffs as $k => $v) {
-      add_post_meta($post_ID, "_$k", $v, true) or update_post_meta($post_ID, "_$k", $v);
+      if (empty($v)) {
+        delete_post_meta($post_ID, "_$k");
+      } else {
+        add_post_meta($post_ID, "_$k", $v, true) or update_post_meta($post_ID, "_$k", $v);
+      }
     }
   }
 
@@ -216,23 +220,32 @@ class hNews {
         clear: both;
       }
 
-      #hnews_org_basic, #hnews_org_address,
+      #hnews_org_basic {
+        overflow: auto;
+      }
+      #hnews_org_basic div {
+        width: 50%;
+        float: left;
+      }
+
+      #hnews_org_more, #hnews_org_address,
       #hnews_principles, #hnews_license {
         width: 50%;
         float: left;
       }
 
-      #hnews_org_basic div, #hnews_org_address div,
-      #hnews_principles div, #hnews_license div,
-      #hnews_geo fieldset div {
+      #hnews_org_basic div, #hnews_org_more div,
+      #hnews_org_address div, #hnews_principles div,
+      #hnews_license div, #hnews_geo fieldset div {
         margin-bottom: 1em;
       }
       #hnews_geo #geo_addrhint {
         margin-bottom: 0;
       }
 
-      #hnews_org_basic label, #hnews_org_address label,
-      #hnews_principles label, #hnews_license label {
+      #hnews_org_basic label, #hnews_org_more label,
+      #hnews_org_address label, #hnews_principles label,
+      #hnews_license label {
         display: block;
       }
 
@@ -245,8 +258,9 @@ class hNews {
         width: 180px;
       }
 
-      #hnews_org_basic input, #hnews_org_address input,
-      #hnews_principles input, #hnews_license input,
+      #hnews_org_basic input, #hnews_org_more input,
+      #hnews_org_address input, #hnews_principles input,
+      #hnews_license input,
       body.settings_page_hNews tr input {
         width: 90%;
         max-width: 400px;
@@ -260,7 +274,7 @@ class hNews {
         width: 90%;
         max-width: 650px;
       }
-    </style>    
+    </style>
 <?php
   }
 
@@ -288,13 +302,20 @@ class hNews {
       elseif ( ! empty($post->{"hnews_$k"})) {
         $$k = $post->{"hnews_$k"};
       }
-    } ?>
+    }
+
+    $principles_url = empty($principles_url) ? 'http://' : $principles_url;
+    $license_url = empty($license_url) ? 'http://' : $license_url;
+    $url = empty($url) ? 'http://' : $url;
+
+    ?>
     <fieldset id="hnews_principles">
       <legend><?php _e('Principles') ?></legend>
       <div>
         <label for="hnews_principles_url"><?php _e('Principles URL:') ?></label>
-        <input name="hnews_principles_url" type="text" class="code" id="hnews_principles_url" value="<?php echo esc_attr($principles_url); ?>" /><br />
         <p class="howto"><?php _e('This is the URL where your statement of principles can be found.'); ?></p>
+        <input name="hnews_principles_url" type="text" class="code url" id="hnews_principles_url" value="<?php echo esc_attr($principles_url); ?>" /><br />
+        <p class="howto"><?php _e('see <a href="http://en.wikipedia.org/wiki/journalism_ethics" rel="external">http://en.wikipedia.org/wiki/journalism_ethics</a>'); ?></p>
       </div>
 
       <div>
@@ -307,18 +328,20 @@ class hNews {
       <legend><?php _e('License') ?></legend>
       <div>
         <label for="hnews_license_url"><?php _e('License URL:') ?></label>
-        <input name="hnews_license_url" type="text" class="code" id="hnews_license_url" value="<?php echo esc_attr($license_url); ?>" />
+        <p class="howto"><?php _e('This is the URL where the license associated with your article can be found.'); ?></p>
+        <input name="hnews_license_url" type="text" class="code url" id="hnews_license_url" value="<?php echo esc_attr($license_url); ?>" />
       </div>
 
       <div>
         <label for="hnews_license_text"><?php _e('License name:') ?></label>
         <input name="hnews_license_text" type="text" id="hnews_license_text" value="<?php echo esc_attr($license_text); ?>" />
+        <p class="howto"><?php _e('e.g. Creative Commons Attribution-Non-Commercial-Share Alike 3.0'); ?></p>
       </div>
     </fieldset>
 
     <fieldset id="hnews_source_org">
       <legend><?php _e('Source Organisation') ?></legend>
-      <p><?php __('All fields are optional.') ?></p>
+      <p><?php __('This is the original publisher of the article.') ?></p>
 
       <div id="hnews_org_basic">
         <div>
@@ -327,6 +350,13 @@ class hNews {
         </div>
 
         <div>
+          <label for="hnews_url"><?php _e('URL:') ?></label>
+          <input name="hnews_url" type="text" class="code" id="hnews_url" value="<?php echo esc_attr($url); ?>" />
+        </div>
+      </div>
+
+      <div id="hnews_org_more">
+        <div>
           <label for="hnews_org_unit"><?php _e('Organization Unit:') ?></label>
           <input name="hnews_org_unit" type="text" id="hnews_org_unit" value="<?php echo esc_attr($org_unit); ?>" />
         </div>
@@ -334,11 +364,6 @@ class hNews {
         <div>
           <label for="hnews_email"><?php _e('Email:') ?></label>
           <input name="hnews_email" type="text" class="code" id="hnews_email" value="<?php echo esc_attr($email); ?>" />
-        </div>
-
-        <div>
-          <label for="hnews_url"><?php _e('URL:') ?></label>
-          <input name="hnews_url" type="text" class="code" id="hnews_url" value="<?php echo esc_attr($url); ?>" />
         </div>
 
         <div>
@@ -354,7 +379,7 @@ class hNews {
         </div>
 
         <div>
-          <label for="hnews_extended_address"><?php _e('Apartment/Suite Number:') ?></label>
+          <label for="hnews_extended_address"><?php _e('<abbr title="apartment">Apt</abbr>/Suite Number:') ?></label>
           <input name="hnews_extended_address" type="text" id="hnews_extended_address" value="<?php echo esc_attr($extended_address); ?>" />
         </div>
 
@@ -383,7 +408,7 @@ class hNews {
           <input name="hnews_country_name" type="text" id="hnews_country_name" value="<?php echo esc_attr($country_name); ?>" />
         </div>
       </div>
-    </fieldset>    
+    </fieldset>
 <?php
   }
 
@@ -418,7 +443,7 @@ class hNews {
         <input type="text" id="geo_addr" name="geo_addr" class="form-input-tip" size="16" autocomplete="off" value="">
         <input type="button" class="button geo_addr" value="Find" tabindex="3">
       </div>
-    </fieldset>    
+    </fieldset>
 <?php
   }
 
