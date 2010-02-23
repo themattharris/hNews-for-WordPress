@@ -1,8 +1,8 @@
 <?php
 
 // Geo
-function the_hnews_geo($before='', $after='', $echo=true) {
-  $geo = get_the_hnews_geo();
+function the_hnews_geo($before='', $after='', $echo=true, $lattxt='latitude ', $lngtxt='longitude ', $seperator=' and ') {
+  $geo = get_the_hnews_geo(0, $lattxt, $lngtxt, $seperator);
 
   if (strlen($geo) == 0)
     return;
@@ -14,16 +14,16 @@ function the_hnews_geo($before='', $after='', $echo=true) {
   else
     return $geo;
 }
-function get_the_hnews_geo($id = 0) {
+function get_the_hnews_geo($id = 0, $lattxt, $lngtxt, $seperator) {
   $post = &get_post($id);
 
   $lat = $post->hnews_geo_latitude;
   $lng = $post->hnews_geo_longitude;
 
-  $geo[] = strlen($lat) == 0 ? '' : "Lat: <span class=\"latitude\">$lat</span>";
-  $geo[] = strlen($lng) == 0 ? '' : "Long: <span class=\"longitude\">$lng</span>";
+  $geo[] = strlen($lat) == 0 ? '' : "$lattxt<span class=\"latitude\">$lat</span>";
+  $geo[] = strlen($lng) == 0 ? '' : "$lngtxt<span class=\"longitude\">$lng</span>";
 
-  return apply_filters('the_hnews_geo', trim(implode(' ', $geo)), $post->ID);
+  return apply_filters('the_hnews_geo', trim(implode($seperator, $geo)), $post->ID);
 }
 
 // Source Organisation
@@ -55,7 +55,7 @@ function get_the_hnews_source_org($id = 0) {
   $region = $post->hnews_region;
   $postal_code = $post->hnews_postal_code;
   $country_name = $post->hnews_country_name;
-  
+
   $org = '';
   if (empty($org_unit) && ! empty($org_name)) {
     if ( ! empty($url)) {
@@ -69,7 +69,7 @@ function get_the_hnews_source_org($id = 0) {
     $org .= "<span class=\"organization-unit\">$org_unit</span>";
     $org .= '</span>';
   }
-  
+
   $adr = '';
   if ( ! empty($post_office_box)) $adr .= "<span class=\"post-office-box\">PO Box $post_office_box</span>, ";
   if ( ! empty($extended_address)) $adr .= "<span class=\"extended-address\">$extended_address</span>, ";
@@ -81,11 +81,11 @@ function get_the_hnews_source_org($id = 0) {
   if ( ! empty($adr)) {
     $adr = '<span class="adr">'.$adr.'</span>, ';
   }
-  
+
   $tel = '';
   if ( ! empty($tel)) $tel .= "<span class=\"tel\">$tel</span>, ";
   if ( ! empty($email)) $tel .= "<a href=\"mailto:$email\" class=\"email\">$email</a>";
-  
+
   return apply_filters('the_hnews_source_org', $org.$adr.$tel, $post->ID);
 }
 
@@ -108,7 +108,8 @@ function get_the_hnews_principles_url($id = 0) {
   if (empty($post->hnews_principles_url))
     return '';
 
-  $url = '<a href="' . $post->hnews_principles_url . '" rel="principles">Principles</a>';
+  $name = strlen($post->hnews_principles_text) == 0 ? $post->hnews_principles_url : $post->hnews_principles_text;
+  $url = '<a href="' . $post->hnews_principles_url . '" rel="principles">' . $name . '</a>';
   return apply_filters('the_hnews_principles_url', $url, $post->ID);
 }
 
@@ -132,8 +133,32 @@ function get_the_hnews_license_url($id = 0) {
     return '';
 
   $name = strlen($post->hnews_license_text) == 0 ? $post->hnews_license_url : $post->hnews_license_text;
-  $url = '<a href="' . $post->hnews_license_url . '" rel="license">' . $post->hnews_license_text . '</a>';
+  $url = '<a href="' . $post->hnews_license_url . '" rel="license">' . $name . '</a>';
   return apply_filters('the_hnews_license_url', $url, $post->ID);
 }
 
+/**
+ * Produces an example hNews meta block
+ *
+ * @return the hNews meta block in HTML
+ */
+function hnews_meta($format='l jS F Y \a\t Hi T') { ?>
+  <!-- hNews meta -->
+	<p class="postmetadata alt hnewsmeta">
+	  <small>
+<?php $geo = the_hnews_geo(' at <span class="geo">', '</span>', false); ?>
+	    Written by <?php the_author(); echo $geo; ?>.
+<?php $time = get_the_time($format);
+	    the_hnews_source_org('First published by <span class="vcard">', "</span> on $time."); ?>
+<?php $principles = the_hnews_principles_url(' and published under ', '', false);
+	    the_hnews_license_url('Licensed as ', "$principles."); ?>
+<?php $mod = get_the_modified_date($format);
+      if ($mod !== $time):
+        _e(" Updated on $mod.");
+      endif; ?>
+
+		</small>
+	</p>
+<?php
+}
 ?>

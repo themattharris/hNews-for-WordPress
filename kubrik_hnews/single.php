@@ -56,16 +56,7 @@ get_header();
 					</small>
 				</p>
 				
-        <!-- hNews meta -->
-				<p class="postmetadata alt hnewsmeta">
-				  <small>
-				    <?php the_hnews_geo('Published at <span class="geo">', '</span>') ?>
-				    <?php the_hnews_source_org('by <span class="vcard">', '</span>.') ?> 
-				    <?php the_hnews_license_url('Licensed as ', ' and ') ?>
-            <?php the_hnews_principles_url('published under ', '.') ?>
-					</small>
-				</p>
-				
+				<?php if (function_exists('hnews_meta')) hnews_meta(); ?>
 			</div>
 		</div>
 
