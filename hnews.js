@@ -1,133 +1,135 @@
-var hnews, hnews_map, hnews_marker, hnews_license;
+var hnews_license = function(id) {
+  var that = this;
 
-(function($){
-  hnews_license = {
-    init : function(selector) {
-      if ( ! $(selector).length) {
-        return;
-      }
+  if (document.getElementById(id)) {
+    id = '#'+id;
 
-      $(selector).blur(function(event){
-        $.get('admin-ajax.php?action=hnews&hnews_url='+escape($(this).val()), function(data) {
-          selector = selector.replace('url', 'text');
-          hnews_license.set_name(selector, data);
-        })
+    var set_name = function(id, name) {
+      jQuery(id).val(name);
+    };
+
+    jQuery(id).blur(function(event){
+      jQuery.get('admin-ajax.php?action=hnews&hnews_url='+escape(jQuery(this).val()), function(data) {
+        set_name(id.replace('url', 'text'), data);
+      })
+    });
+  }
+};
+
+var hnews_hint = function(id, map) {
+  var show = function() {
+    jQuery(id+'hint').hide();
+    if (jQuery(id).val() == '') {
+      jQuery(id).val(jQuery(id+'hint').text());
+    }
+  },
+
+  hide = function() {
+    if (jQuery(id).val() == jQuery(id+'hint').text()) {
+      jQuery(id).val('');
+    }
+  };
+
+  jQuery(id).focus(function() {
+    hide();
+  }).blur(function() {
+    show();
+  }).keydown(function(event) {
+    if (event.which == 13) { // enter
+      map.geocode();
+      return false;
+    }
+  });
+
+  jQuery('input.'+id.replace('#','')).click(function() {
+    map.geocode();
+  });
+
+  show();
+}
+
+var hnews_map = function(id, geocoder_id, div_id) {
+  var map, marker, geocoder,
+      that = this;
+
+  var update = function(loc) {
+    move_to(loc);
+    update_marker(loc);
+    update_textboxes(loc);
+  },
+
+  update_marker = function(loc) {
+    if (marker === undefined) {
+      marker = new google.maps.Marker({
+        position: loc,
+        map: map
       });
-    },
+    } else {
+      marker.setPosition(loc);
+    }
+  },
 
-    set_name : function(selector, name) {
-      $(selector).val(name);
-    },
+  move_to = function(loc) {
+    map.setCenter(loc);
+  },
+
+  update_textboxes = function(loc) {
+    lat = loc.lat().toFixed(4);
+    lng = loc.lng().toFixed(4);
+
+    jQuery(id+'_latitude').val(lat);
+    jQuery(id+'_longitude').val(lng);
+  },
+
+  if (jQuery(id+' fieldset').length) {
+    jQuery(id+' fieldset').before('<div id="'+div_id+'"></div>');
+  } else if ($('tr '+id+'_latitude').length) {
+    jQuery('tr '+id+'_latitude').closest('table').before('<div id="'+div_id+'"></div>');
+  } else {
+    return;
   }
 
-  hnews = {
-    init : function(args) {
-      if ($('#hnews_geo fieldset').length) {
-        $('#hnews_geo fieldset').before('<div id="hnews_map"></div>');
-      } else if ($('tr #hnews_geo_latitude').length) {
-        $('tr #hnews_geo_latitude').closest('table').before('<div id="hnews_map"></div>');
-      } else {
-        return;
-      }
+  lat = jQuery(id+'_latitude').val() || 37.4419;
+  lng = jQuery(id+'_longitude').val() || -122.1419;
+  loc = new google.maps.LatLng(lat, lng);
 
-      lat = $('#hnews_geo_latitude').val() || 37.4419;
-      lng = $('#hnews_geo_longitude').val() || -122.1419;
-      loc = new google.maps.LatLng(lat, lng);
+  map = new google.maps.Map(
+    document.getElementById(div_id), {
+      zoom: 10,
+      center: loc,
+      mapTypeId: google.maps.MapTypeId.ROADMAP,
+    });
 
-      hnews_map = new google.maps.Map(
-        document.getElementById("hnews_map"), {
-          zoom: 10,
-          center: loc,
-          mapTypeId: google.maps.MapTypeId.ROADMAP,
-        });
+  google.maps.event.addListener(map, 'click', function(event) {
+    return update(event.latLng);
+  });
 
-      google.maps.event.addListener(hnews_map, 'click', function(event) {
-        return hnews.update(event.latLng);
-      });
+  if (jQuery(id+'_latitude').val() && jQuery(id+'_longitude').val()) {
+    update_marker(loc);
+  }
 
-      if ($('#hnews_geo_latitude').val() && $('#hnews_geo_longitude').val()) {
-        hnews.update_marker(loc);
-      }
-
-      $('input.geo_addr').click(function() {
-        hnews.geocode();
-      });
-
-      $('#geo_addr').focus(function() {
-        hnews.hide_hint();
-      }).blur(function() {
-        hnews.show_hint();
-      }).keydown(function(event) {
-        if (event.which == 13) { // enter
-          hnews.geocode();
-          return false;
-        }
-      });
-      hnews.show_hint();
-    },
-
-    update : function(loc) {
-      hnews.move_to(loc);
-      hnews.update_marker(loc);
-      hnews.update_textboxes(loc);
-    },
-
-    show_hint : function() {
-      $('#geo_addrhint').hide();
-      if ($('#geo_addr').val() == '') {
-        $('#geo_addr').val($('#geo_addrhint').text());
-      }
-    },
-
-    hide_hint : function() {
-      if ($('#geo_addr').val() == $('#geo_addrhint').text()) {
-        $('#geo_addr').val('');
-      }
-    },
-
-    update_marker : function(loc) {
-      if (hnews_marker === undefined) {
-        hnews_marker = new google.maps.Marker({
-          position: loc,
-          map: hnews_map
-        });
-      } else {
-        hnews_marker.setPosition(loc);
-      }
-    },
-
-    move_to : function(loc) {
-      hnews_map.setCenter(loc);
-    },
-
-    update_textboxes : function(loc) {
-      lat = loc.lat().toFixed(4);
-      lng = loc.lng().toFixed(4);
-
-      $('#hnews_geo_latitude').val(lat);
-      $('#hnews_geo_longitude').val(lng);
-    },
-
+  return {
     geocode : function(address) {
-      address = ( ! address) ? $('#geo_addr').val() : address;
+      address = ( ! address) ? jQuery(geocoder_id).val() : address;
       geocoder = new google.maps.Geocoder();
       geocoder.geocode({
           'address': address
-        },
-        function(results, status) {
-          if (status == google.maps.GeocoderStatus.OK) {
-            hnews.update(results[0].geometry.location);
-            hnews_map.setZoom(15);
-          } else {
-            alert("Could not find that address because: " + status);
-          }
-        });
-    },
-  }
-})(jQuery);
+      },
+      function(results, status) {
+        if (status == google.maps.GeocoderStatus.OK) {
+          update(results[0].geometry.location);
+          map.setZoom(15);
+        } else {
+          alert("Could not find that address because: " + status);
+        }
+      });
+    }
+  };
+}
 
 jQuery(function($){
-  hnews.init();
-  hnews_license.init('#hnews_license_url');
-  hnews_license.init('#hnews_principles_url');
+  geomap = new hnews_map('#hnews_geo', '#geo_addr', 'hnews_map');
+  geohint = new hnews_hint('#geo_addr', geomap);
+  license_url = new hnews_license('hnews_license_url');
+  principles_url = new hnews_license('hnews_principles_url');
 });
