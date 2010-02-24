@@ -24,12 +24,12 @@ class hNews {
 
   var $supported_fields_org = array(
     'org_name'         => 'Organization Name',
+    'url'              => 'URL',
     'org_unit'         => 'Organization Unit',
     'email'            => 'Email',
-    'url'              => 'URL',
     'tel'              => 'Phone',
     'post_office_box'  => 'PO Box',
-    'extended_address' => 'Apartment/Suite Number',
+    'extended_address' => 'Apt/Suite Number',
     'street_address'   => 'Street Address',
     'locality'         => 'City/Town',
     'region'           => 'State/County',
@@ -83,19 +83,19 @@ class hNews {
    */
   function admin_init() {
     register_setting('hnews_options', 'hnews_options', array($this, 'options_validate'));
-    add_settings_section('hnews_settings_main', __('Main Settings'), array($this, 'render_main_section_text'), 'hnews_page');
+    add_settings_section('hnews_main', __('Main Settings'), array($this, 'render_main_section_text'), 'hnews_page');
     foreach ($this->supported_fields_main as $k => $v) {
-      add_settings_field($k, __($v), array($this, 'render'), 'hnews_page', 'hnews_settings_main', $k);
+      add_settings_field($k, __($v), array($this, 'render'), 'hnews_page', 'hnews_main', $k);
     }
 
-    add_settings_section('hnews_settings_org', __('Source Organisation'), array($this, 'render_org_section_text'), 'hnews_page');
+    add_settings_section('hnews_org', __('Source Organisation'), array($this, 'render_org_section_text'), 'hnews_page');
     foreach ($this->supported_fields_org as $k => $v) {
-      add_settings_field($k, __($v), array($this, 'render'), 'hnews_page', 'hnews_settings_org', $k);
+      add_settings_field($k, __($v), array($this, 'render'), 'hnews_page', 'hnews_org', $k);
     }
 
-    add_settings_section('hnews_settings_geo', __('Geolocation'), array($this, 'render_geo_section_text'), 'hnews_page');
+    add_settings_section('hnews_geo', __('Geolocation'), array($this, 'render_geo_section_text'), 'hnews_page');
     foreach ($this->supported_fields_geo as $k => $v) {
-      add_settings_field($k, __($v), array($this, 'render'), 'hnews_page', 'hnews_settings_geo', $k);
+      add_settings_field($k, __($v), array($this, 'render'), 'hnews_page', 'hnews_geo', $k);
     }
   }
 
@@ -131,10 +131,10 @@ class hNews {
     echo '<p>'.__('The URLs and labels you enter here will be used as the default value when adding a new post.').'</p>';
   }
   function render_org_section_text() {
-    echo '<p>'.__('The source organisation you enter here will be used as the default organisation when adding a new post. All fields are optional. ').'</p>';
+    echo '<p>'.__('These are the details of the publisher who should be used for all new posts. All fields are optional and you can change them from within a post. ').'</p>';
   }
   function render_geo_section_text() {
-    echo '<p>'.__('The location you enter here will be used as the default location when adding a new post.').'</p>';
+    echo '<p>'.__('The location you enter here will be used as the co-ordinates in the dateline for the story being published.').'</p>';
   }
 
   /**
@@ -220,7 +220,7 @@ class hNews {
         clear: both;
       }
 
-      #hnews_org_basic {
+      #hnews_org_basic, #hnews_org_more {
         overflow: auto;
       }
       #hnews_org_basic div {
@@ -228,15 +228,23 @@ class hNews {
         float: left;
       }
 
-      #hnews_org_more, #hnews_org_address,
+      #hnews_org_more {
+        padding-top: 1em;
+      }
+
+      #hnews_org_more_hint {
+        text-decoration: none;
+      }
+
+      #hnews_org_other, #hnews_org_address,
       #hnews_principles, #hnews_license {
         width: 50%;
         float: left;
       }
 
       #hnews_org_basic div, #hnews_org_more div,
-      #hnews_org_address div, #hnews_principles div,
-      #hnews_license div, #hnews_geo fieldset div {
+      #hnews_principles div, #hnews_license div,
+      #hnews_geo fieldset div {
         margin-bottom: 1em;
       }
       #hnews_geo #geo_addrhint {
@@ -244,8 +252,7 @@ class hNews {
       }
 
       #hnews_org_basic label, #hnews_org_more label,
-      #hnews_org_address label, #hnews_principles label,
-      #hnews_license label {
+      #hnews_principles label, #hnews_license label {
         display: block;
       }
 
@@ -259,8 +266,7 @@ class hNews {
       }
 
       #hnews_org_basic input, #hnews_org_more input,
-      #hnews_org_address input, #hnews_principles input,
-      #hnews_license input,
+      #hnews_principles input, #hnews_license input,
       body.settings_page_hNews tr input {
         width: 90%;
         max-width: 400px;
@@ -356,56 +362,58 @@ class hNews {
       </div>
 
       <div id="hnews_org_more">
-        <div>
-          <label for="hnews_org_unit"><?php _e('Organization Unit:') ?></label>
-          <input name="hnews_org_unit" type="text" id="hnews_org_unit" value="<?php echo esc_attr($org_unit); ?>" />
+        <div id="hnews_org_other">
+          <div>
+            <label for="hnews_org_unit"><?php _e('Organization Unit:') ?></label>
+            <input name="hnews_org_unit" type="text" id="hnews_org_unit" value="<?php echo esc_attr($org_unit); ?>" />
+          </div>
+
+          <div>
+            <label for="hnews_email"><?php _e('Email:') ?></label>
+            <input name="hnews_email" type="text" class="code" id="hnews_email" value="<?php echo esc_attr($email); ?>" />
+          </div>
+
+          <div>
+            <label for="hnews_tel"><?php _e('Phone:') ?></label>
+            <input name="hnews_tel" type="text" id="hnews_tel" value="<?php echo esc_attr($tel); ?>" />
+          </div>
         </div>
 
-        <div>
-          <label for="hnews_email"><?php _e('Email:') ?></label>
-          <input name="hnews_email" type="text" class="code" id="hnews_email" value="<?php echo esc_attr($email); ?>" />
-        </div>
+        <div id="hnews_org_address">
+          <div>
+            <label for="hnews_post_office_box"><?php _e('PO Box:') ?></label>
+            <input name="hnews_post_office_box" type="text" id="hnews_post_office_box" value="<?php echo esc_attr($post_office_box); ?>" />
+          </div>
 
-        <div>
-          <label for="hnews_tel"><?php _e('Phone:') ?></label>
-          <input name="hnews_tel" type="text" id="hnews_tel" value="<?php echo esc_attr($tel); ?>" />
-        </div>
-      </div>
+          <div>
+            <label for="hnews_extended_address"><?php _e('<abbr title="apartment">Apt</abbr>/Suite Number:') ?></label>
+            <input name="hnews_extended_address" type="text" id="hnews_extended_address" value="<?php echo esc_attr($extended_address); ?>" />
+          </div>
 
-      <div id="hnews_org_address">
-        <div>
-          <label for="hnews_post_office_box"><?php _e('PO Box:') ?></label>
-          <input name="hnews_post_office_box" type="text" id="hnews_post_office_box" value="<?php echo esc_attr($post_office_box); ?>" />
-        </div>
+          <div>
+            <label for="hnews_street_address"><?php _e('Street Address:') ?></label>
+            <input name="hnews_street_address" type="text" id="hnews_street_address" value="<?php echo esc_attr($street_address); ?>" />
+          </div>
 
-        <div>
-          <label for="hnews_extended_address"><?php _e('<abbr title="apartment">Apt</abbr>/Suite Number:') ?></label>
-          <input name="hnews_extended_address" type="text" id="hnews_extended_address" value="<?php echo esc_attr($extended_address); ?>" />
-        </div>
+          <div>
+            <label for="hnews_locality"><?php _e('City/Town:') ?></label>
+            <input name="hnews_locality" type="text" id="hnews_locality" value="<?php echo esc_attr($locality); ?>" />
+          </div>
 
-        <div>
-          <label for="hnews_street_address"><?php _e('Street Address:') ?></label>
-          <input name="hnews_street_address" type="text" id="hnews_street_address" value="<?php echo esc_attr($street_address); ?>" />
-        </div>
+          <div>
+            <label for="hnews_region"><?php _e('State/County:') ?></label>
+            <input name="hnews_region" type="text" id="hnews_region" value="<?php echo esc_attr($region); ?>" />
+          </div>
 
-        <div>
-          <label for="hnews_locality"><?php _e('City/Town:') ?></label>
-          <input name="hnews_locality" type="text" id="hnews_locality" value="<?php echo esc_attr($locality); ?>" />
-        </div>
+          <div>
+            <label for="hnews_postal_code"><?php _e('Zip/Postal Code:') ?></label>
+            <input name="hnews_postal_code" type="text" id="hnews_postal_code" value="<?php echo esc_attr($postal_code); ?>" />
+          </div>
 
-        <div>
-          <label for="hnews_region"><?php _e('State/County:') ?></label>
-          <input name="hnews_region" type="text" id="hnews_region" value="<?php echo esc_attr($region); ?>" />
-        </div>
-
-        <div>
-          <label for="hnews_postal_code"><?php _e('Zip/Postal Code:') ?></label>
-          <input name="hnews_postal_code" type="text" id="hnews_postal_code" value="<?php echo esc_attr($postal_code); ?>" />
-        </div>
-
-        <div>
-          <label for="hnews_country_name"><?php _e('Country:') ?></label>
-          <input name="hnews_country_name" type="text" id="hnews_country_name" value="<?php echo esc_attr($country_name); ?>" />
+          <div>
+            <label for="hnews_country_name"><?php _e('Country:') ?></label>
+            <input name="hnews_country_name" type="text" id="hnews_country_name" value="<?php echo esc_attr($country_name); ?>" />
+          </div>
         </div>
       </div>
     </fieldset>

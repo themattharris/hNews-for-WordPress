@@ -83,7 +83,7 @@ var hnews_map = function(id, geocoder_id, div_id) {
 
   if (jQuery(id+' fieldset').length) {
     jQuery(id+' fieldset').before('<div id="'+div_id+'"></div>');
-  } else if ($('tr '+id+'_latitude').length) {
+  } else if (jQuery('tr '+id+'_latitude').length) {
     jQuery('tr '+id+'_latitude').closest('table').before('<div id="'+div_id+'"></div>');
   } else {
     return;
@@ -127,9 +127,43 @@ var hnews_map = function(id, geocoder_id, div_id) {
   };
 }
 
+var hnews_showmore = function(id, text) {
+  var hintid = id+'_hint';
+      content = '<a id="'+hintid+'" href="#'+id+'">+ '+text+'</a>';
+
+  id = '#'+id;
+
+  var replace_text = function(a, b) {
+    jQuery('#'+hintid).text(
+      jQuery('#'+hintid).text().replace(a, b)
+    );
+  },
+  toggle = function() {
+    if (jQuery(id).is(':visible')) {
+      jQuery(id).hide();
+      replace_text('-', '+');
+    } else {
+      jQuery(id).show();
+      replace_text('+', '-');
+    }
+  };
+
+  if (jQuery(id).length) {
+    jQuery(id).before(content)
+      .hide();
+    jQuery('#'+hintid).click(function(event) {
+      event.preventDefault();
+      toggle();
+      return false;
+    });
+  }
+
+}
+
 jQuery(function($){
   geomap = new hnews_map('#hnews_geo', '#geo_addr', 'hnews_map');
   geohint = new hnews_hint('#geo_addr', geomap);
   license_url = new hnews_license('hnews_license_url');
   principles_url = new hnews_license('hnews_principles_url');
+  togglr = new hnews_showmore('hnews_org_more', 'Add more information about source organization');
 });
