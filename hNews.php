@@ -17,7 +17,7 @@ class hNews {
 
   var $supported_fields_main = array(
     'principles_url'  => 'Principles URL',
-    'principles_text' => 'Principles Label',
+    'principles_text' => 'Principles Name',
     'license_url'     => 'License URL',
     'license_text'    => 'License Name',
   );
