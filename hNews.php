@@ -325,7 +325,7 @@ class hNews {
       </div>
 
       <div>
-        <label for="hnews_principles_text"><?php _e('Principles label:') ?></label>
+        <label for="hnews_principles_text"><?php _e('Principles name:') ?></label>
         <input name="hnews_principles_text" type="text" id="hnews_principles_text" value="<?php echo esc_attr($principles_text); ?>" />
       </div>
     </fieldset>
