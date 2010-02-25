@@ -40,7 +40,7 @@ function the_hnews_source_org($before='', $after='', $echo=true) {
   else
     return $org;
 }
-function get_the_hnews_source_org($id = 0) {
+function get_the_hnews_source_org($id = 0, $seperator=', ') {
   $post = &get_post($id);
 
   $org_name = $post->hnews_org_name;
@@ -70,21 +70,22 @@ function get_the_hnews_source_org($id = 0) {
     $org .= '</span>';
   }
 
-  $adr = '';
-  if ( ! empty($post_office_box)) $adr .= "<span class=\"post-office-box\">PO Box $post_office_box</span>, ";
-  if ( ! empty($extended_address)) $adr .= "<span class=\"extended-address\">$extended_address</span>, ";
-  if ( ! empty($street_address)) $adr .= "<span class=\"street-address\">$street_address</span>, ";
-  if ( ! empty($locality)) $adr .= "<span class=\"locality\">$locality</span>, ";
-  if ( ! empty($region)) $adr .= "<span class=\"region\">$region</span>";
-  if ( ! empty($postal_code)) $adr .= "<span class=\"postal-code\">$postal_code</span>";
-  if ( ! empty($country_name)) $adr .= "<span class=\"country-name\">$country_name</span>";
+  $adr = array();
+  if ( ! empty($post_office_box)) $adr[] = "<span class=\"post-office-box\">PO Box $post_office_box</span>";
+  if ( ! empty($extended_address)) $adr[] = "<span class=\"extended-address\">$extended_address</span>";
+  if ( ! empty($street_address)) $adr[] = "<span class=\"street-address\">$street_address</span>";
+  if ( ! empty($locality)) $adr[] = "<span class=\"locality\">$locality</span>";
+  if ( ! empty($region)) $adr[] = "<span class=\"region\">$region</span>";
+  if ( ! empty($postal_code)) $adr[] = "<span class=\"postal-code\">$postal_code</span>";
+  if ( ! empty($country_name)) $adr[] = "<span class=\"country-name\">$country_name</span>";
   if ( ! empty($adr)) {
-    $adr = '<span class="adr">'.$adr.'</span>, ';
+    $adr = '<span class="adr">'.implode($seperator, $adr).'</span>, ';
   }
 
-  $tel = '';
-  if ( ! empty($tel)) $tel .= "<span class=\"tel\">$tel</span>, ";
-  if ( ! empty($email)) $tel .= "<a href=\"mailto:$email\" class=\"email\">$email</a>";
+  $tel = array();
+  if ( ! empty($tel)) $tel[] = "<span class=\"tel\">$tel</span>";
+  if ( ! empty($email)) $tel[] = "<a href=\"mailto:$email\" class=\"email\">$email</a>";
+  $tel = implode($seperator, $tel);
 
   return apply_filters('the_hnews_source_org', $org.$adr.$tel, $post->ID);
 }
@@ -149,9 +150,9 @@ function hnews_meta($format='l jS F Y \a\t Hi T') { ?>
 <?php $geo = the_hnews_geo(' at <span class="geo">', '</span>', false); ?>
 	    Written by <?php the_author(); echo $geo; ?>.
 <?php $time = get_the_time($format);
-	    the_hnews_source_org('First published by <span class="vcard">', "</span> on $time."); ?>
+	    the_hnews_source_org(' First published by <span class="vcard">', "</span> on $time."); ?>
 <?php $principles = the_hnews_principles_url(' and published under ', '', false);
-	    the_hnews_license_url('Licensed as ', "$principles."); ?>
+	    the_hnews_license_url(' Licensed as ', "$principles."); ?>
 <?php $mod = get_the_modified_date($format);
       if ($mod !== $time):
         _e(" Updated on $mod.");
