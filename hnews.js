@@ -79,7 +79,7 @@ var hnews_map = function(id, geocoder_id, div_id) {
 
     jQuery(id+'_latitude').val(lat);
     jQuery(id+'_longitude').val(lng);
-  },
+  };
 
   if (jQuery(id+' fieldset').length) {
     jQuery(id+' fieldset').before('<div id="'+div_id+'"></div>');
