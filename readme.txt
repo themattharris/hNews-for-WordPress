@@ -9,7 +9,7 @@ Adds extra fields to a post for storing hNews specific information. Includes a s
 
 == Description ==
 
-Add a contact form to any post or page by inserting `[contact-form]` in the post.  Emails will be sent to the post's author.
+Adds extra fields to a post for storing hNews specific information. Includes a settings page for adding default values for the fields.
 
 This version is the development trunk and is still in Alpha. It is not fully tested for production use yet.
 
