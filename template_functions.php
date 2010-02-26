@@ -66,6 +66,7 @@ function get_the_hnews_source_org($id = 0, $seperator=', ') {
   } elseif ( ! empty($org_unit)) {
     $org .= '<span class="fn">';
     $org .= "<span class=\"organization-name\">$org_name</span>";
+    $org .= $seperator;
     $org .= "<span class=\"organization-unit\">$org_unit</span>";
     $org .= '</span>';
   }
@@ -79,7 +80,7 @@ function get_the_hnews_source_org($id = 0, $seperator=', ') {
   if ( ! empty($postal_code)) $adr[] = "<span class=\"postal-code\">$postal_code</span>";
   if ( ! empty($country_name)) $adr[] = "<span class=\"country-name\">$country_name</span>";
   if ( ! empty($adr)) {
-    $adr = '<span class="adr">'.implode($seperator, $adr).'</span>, ';
+    $adr = '<span class="adr">'.implode($seperator, $adr).'</span>';
   }
 
   $tel = array();
@@ -87,7 +88,7 @@ function get_the_hnews_source_org($id = 0, $seperator=', ') {
   if ( ! empty($email)) $tel[] = "<a href=\"mailto:$email\" class=\"email\">$email</a>";
   $tel = implode($seperator, $tel);
 
-  return apply_filters('the_hnews_source_org', $org.$adr.$tel, $post->ID);
+  return apply_filters('the_hnews_source_org', $org.$seperator.$adr.$seperator.$tel, $post->ID);
 }
 
 // Principles
@@ -147,15 +148,20 @@ function hnews_meta($format='l jS F Y \a\t Hi T') { ?>
   <!-- hNews meta -->
 	<p class="postmetadata alt hnewsmeta">
 	  <small>
-<?php $geo = the_hnews_geo(' at <span class="geo">', '</span>', false); ?>
-	    Written by <?php the_author(); echo $geo; ?>.
-<?php $time = get_the_time($format);
-	    the_hnews_source_org(' First published by <span class="vcard">', "</span> on $time."); ?>
+<?php $geo = the_hnews_geo(' at <span class="geo">', '</span>', false);
+      if ( get_the_author_meta('url') ) {
+    		$author = '<span class="hcard"><a href="' . get_the_author_meta('url') . '" title="' . esc_attr( sprintf(__("Visit %s&#8217;s website"), get_the_author()) ) . '" class="fn url" rel="external">' . get_the_author() . '</a></span>';
+    	} else {
+    		$author = get_the_author();
+    	} ?>
+	    Written by <?php echo $author; echo $geo; ?>.
+<?php $time = '<span class="value-title" title="' . get_the_time('c') . '">' . get_the_time($format) . '</span>';
+	    the_hnews_source_org(' <span class="published">First published by <span class="vcard">', "</span> on $time</span>."); ?>
 <?php $principles = the_hnews_principles_url(' and published under ', '', false);
 	    the_hnews_license_url(' Licensed as ', "$principles."); ?>
-<?php $mod = get_the_modified_date($format);
+<?php $mod = '<span class="value-title" title="' . get_the_modified_date('c') . '">' . get_the_modified_date($format) . '</span>';
       if ($mod !== $time):
-        _e(" Updated on $mod.");
+        _e(' <span class="updated">Updated on ' . $mod . '</span>');
       endif; ?>
 
 		</small>
