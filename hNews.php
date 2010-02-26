@@ -144,9 +144,7 @@ class hNews {
     add_meta_box('hnews_main', __('hNews'), array($this, 'meta_box_main'), 'post', 'normal', 'high');
     add_meta_box('hnews_geo', __('Geolocation'), array($this, 'meta_box_geo'), 'post', 'side', 'high');
 
-    // using edit_others_posts as these defaults affect everyone. Maybe in the future use edit_posts - or allow this default to be set per editor?
-    // other alternative is to use manage_options so only the admin can do it.
-    add_options_page('hNews Defaults', 'hNews', 'edit_others_posts', 'hNews', array($this, 'hnews_options_page'));
+    add_options_page('hNews Defaults', 'hNews', 'manage_options', 'hNews', array($this, 'hnews_options_page'));
   }
 
   /**
