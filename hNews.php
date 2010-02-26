@@ -3,9 +3,9 @@
 /*
 Plugin Name: hNews
 Plugin URI: http://valueaddednews.org
-Description:
+Description: Adds extra fields to a post for storing hNews specific information. Includes a settings page for adding default values for the fields.
 Author: Matt Harris
-Version: 1.0
+Version: trunk
 Author URI: http://themattharris.com
 */
 
