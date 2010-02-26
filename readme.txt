@@ -23,4 +23,5 @@ using the Issues and Wiki on there.
 
 = How do I add the fields to my template =
 
-Included in the plugin is the default WordPress Kubrik theme with hNews fields added to it.
+Included in the plugin is the default WordPress Kubrik theme with hNews fields added to it. Checkout the single.php and page.php files to see how we've added the fields to the template.
+The plugin includes a function [code]hnews_meta[/code] which can be used to produce the hnews meta markup block.
