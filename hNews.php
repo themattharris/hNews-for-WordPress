@@ -25,6 +25,9 @@ class hNews {
   var $supported_fields_org = array(
     'org_name'         => 'Organization Name',
     'url'              => 'URL',
+  );
+
+  var $supported_fields_org_more = array(
     'org_unit'         => 'Organization Unit',
     'email'            => 'Email',
     'tel'              => 'Phone',
@@ -93,6 +96,11 @@ class hNews {
       add_settings_field($k, __($v), array($this, 'render'), 'hnews_page', 'hnews_org', $k);
     }
 
+    add_settings_section('hnews_org_more', '', '', 'hnews_page');
+    foreach ($this->supported_fields_org_more as $k => $v) {
+      add_settings_field($k, __($v), array($this, 'render'), 'hnews_page', 'hnews_org_more', $k);
+    }
+
     add_settings_section('hnews_geo', __('Geolocation'), array($this, 'render_geo_section_text'), 'hnews_page');
     foreach ($this->supported_fields_geo as $k => $v) {
       add_settings_field($k, __($v), array($this, 'render'), 'hnews_page', 'hnews_geo', $k);
@@ -159,7 +167,7 @@ class hNews {
     foreach ($this->supported_fields_geo as $k => $v) {
       $defaults["hnews_$k"] = 0;
     }
-    foreach ($this->supported_fields_main + $this->supported_fields_org as $k => $v) {
+    foreach ($this->supported_fields_main + $this->supported_fields_org + $this->supported_fields_org_more as $k => $v) {
       $defaults["hnews_$k"] = strstr($k, 'url') ? 'http://' : "\n";
     }
 
@@ -302,7 +310,7 @@ class hNews {
       $this->post_to_edit($post);
     }
     $options = get_option('hnews_options');
-    foreach ($this->supported_fields_main + $this->supported_fields_org as $k => $v) {
+    foreach ($this->supported_fields_main + $this->supported_fields_org + $this->supported_fields_org_more as $k => $v) {
       if (empty($post->{"hnews_$k"}) && empty($post->ID))
         $$k = $options[$k];
       elseif ( ! empty($post->{"hnews_$k"})) {
@@ -460,7 +468,7 @@ class hNews {
    */
   function post_to_edit($post) {
     $id = $post->ID;
-    foreach ($this->supported_fields_geo + $this->supported_fields_main + $this->supported_fields_org as $k => $v) {
+    foreach ($this->supported_fields_geo + $this->supported_fields_main + $this->supported_fields_org + $this->supported_fields_org_more as $k => $v) {
       $post->{"hnews_$k"} = get_post_meta($id, "_hnews_$k", true );
     }
     return $post;

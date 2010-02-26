@@ -157,7 +157,6 @@ var hnews_showmore = function(id, text) {
       return false;
     });
   }
-
 }
 
 jQuery(function($){
@@ -165,5 +164,7 @@ jQuery(function($){
   geohint = new hnews_hint('#geo_addr', geomap);
   license_url = new hnews_license('hnews_license_url');
   principles_url = new hnews_license('hnews_principles_url');
+
+  jQuery('#hnews_org_unit').parents('table').attr('id', 'hnews_org_more');
   togglr = new hnews_showmore('hnews_org_more', 'Add more information about source organization');
 });
