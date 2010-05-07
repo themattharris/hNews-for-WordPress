@@ -7,7 +7,7 @@
 get_header();
 ?>
 
-	<div id="content" class="widecolumn hnews hatom" role="main">
+	<div id="content" class="widecolumn" role="main">
 
 	<?php if (have_posts()) : while (have_posts()) : the_post(); ?>
 
@@ -33,7 +33,7 @@ get_header();
 							http://binarybonsai.com/wordpress/time-since/ */
 							/* $entry_datetime = abs(strtotime($post->post_date) - (60*120)); echo time_since($entry_datetime); echo ' ago'; */ ?>
 						on <?php the_time('l, F jS, Y') ?> at <?php the_time() ?>
-						and is filed under <?php the_category(', ') ?>. 
+						and is filed under <?php the_category(', ') ?>.
 						You can follow any responses to this entry through the <?php post_comments_feed_link('RSS 2.0'); ?> feed.
 
 						<?php if ( comments_open() && pings_open() ) {
@@ -53,10 +53,12 @@ get_header();
 							Both comments and pings are currently closed.
 
 						<?php } edit_post_link('Edit this entry','','.'); ?>
+
 					</small>
 				</p>
 				
 				<?php if (function_exists('hnews_meta')) hnews_meta(); ?>
+
 			</div>
 		</div>
 
