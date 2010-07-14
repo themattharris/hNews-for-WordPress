@@ -298,7 +298,7 @@ class hNews {
    */
   function add_js() {
     echo '<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>';
-    wp_enqueue_script('hNews', '/'.PLUGINDIR.'/hNews/hnews.js');
+    wp_enqueue_script('hNews', '/'.PLUGINDIR.'/'.basename(dirname(__FILE__)).'/hnews.js');
   }
 
   /**
