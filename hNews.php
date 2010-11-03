@@ -66,6 +66,7 @@ class hNews {
     add_action('admin_print_scripts-post-new.php', array($this, 'add_js'));
 
     // This filter needs adding to WordPress core. line 395 wp-admin/includes/post.php
+    // (see http://core.trac.wordpress.org/ticket/12568)
     // add_filter('post_to_edit', array($this, 'post_to_edit'));
 
     // custom ajax handling for looking up the title of a webpage. The hnews is the querystring argument 'action'
@@ -312,12 +313,9 @@ class hNews {
       $this->post_to_edit($post);
     }
     $options = get_option('hnews_options');
+    $is_fresh_post = isset( $_GET['post'] ) ? FALSE: TRUE;
     foreach ($this->supported_fields_main + $this->supported_fields_org + $this->supported_fields_org_more as $k => $v) {
-      if (empty($post->{"hnews_$k"}) && empty($post->ID))
-        $$k = $options[$k];
-      elseif ( ! empty($post->{"hnews_$k"})) {
-        $$k = $post->{"hnews_$k"};
-      }
+      $$k = $is_fresh_post ? $options[$k] : $post->{"hnews_$k"};
     }
 
     $principles_url = empty($principles_url) ? 'http://' : $principles_url;
@@ -438,14 +436,14 @@ class hNews {
     if ( ! isset($post->hnews_geo_latitude)) {
       $this->post_to_edit($post);
     }
+    // fill in fields, using admin defaults for new posts
+    $is_fresh_post = isset( $_GET['post'] ) ? FALSE: TRUE;
     $options = get_option('hnews_options');
     foreach ($this->supported_fields_geo as $k => $v) {
-      if (empty($post->{"hnews_$k"}) && empty($post->ID))
-        $$k = $options[$k];
-      elseif ( ! empty($post->{"hnews_$k"})) {
-        $$k = $post->{"hnews_$k"};
-      }
-    } ?>
+        $$k = $is_fresh_post ? $options[$k] : $post->{"hnews_$k"};
+    }
+
+    ?>
     <fieldset>
       <div>
         <label for="hnews_geo_latitude"><?php _e('Latitude:') ?></label>
