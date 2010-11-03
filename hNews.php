@@ -96,7 +96,7 @@ class hNews {
       add_settings_field($k, __($v), array($this, 'render'), 'hnews_page', 'hnews_org', $k);
     }
 
-    add_settings_section('hnews_org_more', '', '', 'hnews_page');
+    add_settings_section('hnews_org_more', '', array($this, 'render_org_more_section_text'), 'hnews_page');
     foreach ($this->supported_fields_org_more as $k => $v) {
       add_settings_field($k, __($v), array($this, 'render'), 'hnews_page', 'hnews_org_more', $k);
     }
@@ -140,6 +140,8 @@ class hNews {
   }
   function render_org_section_text() {
     echo '<p>'.__('These are the details of the publisher who should be used for all new posts. All fields are optional and you can change them from within a post. ').'</p>';
+  }
+  function render_org_more_section_text() {
   }
   function render_geo_section_text() {
     echo '<p>'.__('The location you enter here will be used as the co-ordinates in the dateline for the story being published.').'</p>';
