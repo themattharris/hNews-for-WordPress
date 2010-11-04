@@ -114,9 +114,17 @@ class hNews {
    * allows WordPress to check the user is logged in
    */
   function wp_ajax() {
-    if ($response = wp_remote_get(@$_GET['hnews_url'])) {
-      if (preg_match('$<title.*?>(.+?)</title>$is', $response['body'], $matches) == 1) {
-        echo preg_replace('$\s\s+$',' ', strip_tags(trim($matches[1])));
+    $url = @$_GET['hnews_url'];
+    // skip fetching a couple of likely cases
+    if( $url=='' or $url=='http://') {
+        die();
+    }
+    // (TODO: other bad urls, eg "http:/" will still cause problems...)
+    if ($response = wp_remote_get( $url )) {
+      if( !is_wp_error( $response ) ) {
+        if (preg_match('$<title.*?>(.+?)</title>$is', $response['body'], $matches) == 1) {
+          echo preg_replace('$\s\s+$',' ', strip_tags(trim($matches[1])));
+        }
       }
     }
     // stop processing.
