@@ -1,0 +1,67 @@
+
+## Installing the plugin
+
+
+## Adding hNews to an hAtom-supporting theme
+
+hNews builds upon the [hAtom][1] microformat. Luckily, many wordpress
+themes already support hAtom, so most of the work is already done for
+you.
+
+You'll first need to add an `hnews` class to the post, alongside the
+existing `hentry`. In most modern themes, this is handled by
+the [post_class][2] template tag, so look through the theme files
+for:
+
+    <div id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
+
+and change it to:
+
+    <div id="post-<?php the_ID(); ?>" <?php post_class('hnews'); ?>>
+
+For themes that don't use `post_class()`, you'll instead see something like:
+
+    <div id="post-<?php the_ID();?>"  class="post hentry">
+
+Change it to:
+
+    <div id="post-<?php the_ID();?>"  class="post hentry hnews">
+
+
+
+TODO: list likely php files, using twentyten as an example.
+
+
+
+You then need to tell your theme to output the hNews-specific fields -
+license, principles, dateline (geo) and source organization. This can
+be done with a single call to `hnews_meta()`. Just insert this line:
+
+     <?php if (function_exists('hnews_meta')) hnews_meta(); ?>
+
+This should be inside the `hnews` div, and outside the
+`entry-content` div (you don't want the hnews data to be
+treated as part of the content text).
+
+If you're using an off-the-shelf wordpress theme, it's probably worth
+implementing your hNews-supporting version of it as a [child theme] [4].
+This will make it easier to track any future updates to the original
+theme.
+
+
+
+
+
+
+[1]: http://microformats.org/wiki/hatom
+   "hAtom specification"
+
+[2]: http://codex.wordpress.org/Template_Tags/post_class>
+   "wordpress post_class() documentation"
+
+[3]: http://blog.no-panic.at/2006/11/16/hatom-and-wordpress/
+   "tutorial on adding hAtom to a wordpress theme"
+
+[4] http://codex.wordpress.org/Child_Themes
+   "About child themes in wordpress"
+
