@@ -1,5 +1,5 @@
 === hNews for WordPress ===
-Contributors: themattharris
+Contributors: themattharris, ben_campbell
 Tags: hNews, microformats, news, journalism
 Stable tag: trunk
 Requires at least: 2.8
